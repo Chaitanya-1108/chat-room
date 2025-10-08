@@ -4,7 +4,6 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mysql = require('mysql2/promise');
 
-// Use Render's PORT environment variable
 const PORT = process.env.PORT || 3005;
 
 // Serve static files
@@ -15,16 +14,16 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// MySQL Connection using environment variables
+// MySQL Connection
 let db;
 const connectDB = async () => {
     try {
         db = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASS,
-            database: process.env.DB_NAME,
-            port: process.env.DB_PORT || 3307
+            host: 'localhost',
+            user: 'root',
+            password: '',       
+            database: 'chat_app',
+            port: 3307          
         });
         console.log('✅ Connected to MySQL database!');
     } catch (err) {
@@ -38,7 +37,7 @@ connectDB();
 io.on('connection', async (socket) => {
     console.log('📱 New Device Connected');
 
-    // Handle user login
+    // Handle login
     socket.on('setUser', async (username) => {
         try {
             let [rows] = await db.execute('SELECT id FROM users WHERE username = ?', [username]);
@@ -69,7 +68,7 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // Handle new messages
+    // Listen for new messages
     socket.on('message', async (data) => {
         const { user_id, username, message } = data;
         if (!message || !user_id) return;

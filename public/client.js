@@ -1,7 +1,5 @@
-// Connect to server
 const socket = io();
 
-// Elements
 const textarea = document.getElementById('textarea');
 const sendBtn = document.getElementById('sendBtn');
 const messageArea = document.querySelector('.message__area');
@@ -16,10 +14,8 @@ do {
     username = prompt('Enter your username:').trim();
 } while (!username);
 
-// Send username to server
 socket.emit('setUser', username);
 
-// Receive user_id from server
 socket.on('userSet', (id) => {
     user_id = id;
 });
@@ -37,7 +33,7 @@ function sendMessage() {
 // Button click
 sendBtn.addEventListener('click', sendMessage);
 
-// Enter key: Enter=send, Shift+Enter=new line
+// Enter key
 textarea.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -70,14 +66,10 @@ socket.on('stopTyping', (data) => {
 });
 
 function updateTypingIndicator() {
-    if (typingUsers.size === 0) {
-        typingIndicator.textContent = '';
-    } else {
-        typingIndicator.textContent = `${[...typingUsers].join(', ')} is typing...`;
-    }
+    typingIndicator.textContent = typingUsers.size === 0 ? '' : `${[...typingUsers].join(', ')} is typing...`;
 }
 
-// Append message with timestamp
+// Append message
 function appendMessage(msg) {
     const div = document.createElement('div');
     div.classList.add(msg.user_id === user_id ? 'outgoing' : 'incoming', 'message');
